@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Log Explorer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="layout">
+
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡️
+            <span>SOC Sentinel</span>
+        </div>
+
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}"
+               class="active">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}">
+                Detection Rules
+            </a>
+
+            <a href="{{ url_for('mitre') }}">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+
+            Logout
+
+        </a>
+
+    </aside>
+
+
+    <!-- Main -->
+
+    <main class="main-content">
+
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Log Explorer</h1>
+
+                <p>
+                    Search and investigate security logs
+                </p>
+
+            </div>
+
+
+            <div class="user-info">
+
+                👤 {{ current_user.username }}
+
+            </div>
+
+        </header>
+
+
+        <!-- Search / Filters -->
+
+        <section class="panel log-filter-panel">
+
+            <div class="panel-header">
+
+                <h2>Search Logs</h2>
+
+                <span>
+                    {{ pagination.total }} logs
+                </span>
+
+            </div>
+
+
+            <form method="GET"
+                  action="{{ url_for('logs') }}"
+                  class="log-filter-form">
+
+
+                <div class="filter-group">
+
+                    <label>
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="Message, IP address, username"
+                    >
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label>
+                        Level
+                    </label>
+
+                    <select name="level">
+
+                        <option value="">
+                            All Levels
+                        </option>
+
+                        <option value="INFO"
+                            {% if level == "INFO" %}
+                            selected
+                            {% endif %}>
+                            INFO
+                        </option>
+
+                        <option value="WARNING"
+                            {% if level == "WARNING" %}
+                            selected
+                            {% endif %}>
+                            WARNING
+                        </option>
+
+                        <option value="ERROR"
+                            {% if level == "ERROR" %}
+                            selected
+                            {% endif %}>
+                            ERROR
+                        </option>
+
+                        <option value="CRITICAL"
+                            {% if level == "CRITICAL" %}
+                            selected
+                            {% endif %}>
+                            CRITICAL
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label>
+                        Source
+                    </label>
+
+                    <select name="source">
+
+                        <option value="">
+                            All Sources
+                        </option>
+
+                        {% for item in sources %}
+
+                        <option value="{{ item }}"
+                            {% if source == item %}
+                            selected
+                            {% endif %}>
+
+                            {{ item }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-buttons">
+
+                    <button
+                        type="submit"
+                        class="back-button">
+
+                        Search
+
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('logs') }}"
+                        class="clear-button">
+
+                        Clear
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- Logs -->
+
+        <section class="panel logs-panel">
+
+            <div class="panel-header">
+
+                <h2>Security Logs</h2>
+
+                <span>
+                    Page {{ pagination.page }}
+                    of {{ pagination.pages or 1 }}
+                </span>
+
+            </div>
+
+
+            {% if logs %}
+
+            <div class="logs-table-wrapper">
+
+                <table class="logs-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Level
+                            </th>
+
+                            <th>
+                                Source
+                            </th>
+
+                            <th>
+                                Message
+                            </th>
+
+                            <th>
+                                IP Address
+                            </th>
+
+                            <th>
+                                User
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for log in logs %}
+
+                        <tr class="
+                            {% if log.level in ['ERROR', 'CRITICAL'] %}
+                                suspicious-log
+                            {% endif %}
+                        ">
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for(
+                                        'log_details',
+                                        log_id=log.id
+                                    ) }}"
+                                    class="log-time">
+
+                                    {{ log.timestamp.strftime(
+                                        "%d %b %Y, %H:%M:%S"
+                                    ) }}
+
+                                </a>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="log-level
+                                    {{ log.level|lower }}">
+
+                                    {{ log.level }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                {{ log.source }}
+                            </td>
+
+
+                            <td class="log-message">
+
+                                {{ log.message }}
+
+                            </td>
+
+
+                            <td>
+
+                                {{ log.ip_address or "-" }}
+
+                            </td>
+
+
+                            <td>
+
+                                {{ log.username or "-" }}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- Pagination -->
+
+            <div class="pagination">
+
+                {% if pagination.has_prev %}
+
+                <a href="{{ url_for(
+                    'logs',
+                    page=pagination.prev_num,
+                    search=search,
+                    level=level,
+                    source=source
+                ) }}">
+                    ← Previous
+                </a>
+
+                {% endif %}
+
+
+                <span>
+                    Page {{ pagination.page }}
+                    of {{ pagination.pages or 1 }}
+                </span>
+
+
+                {% if pagination.has_next %}
+
+                <a href="{{ url_for(
+                    'logs',
+                    page=pagination.next_num,
+                    search=search,
+                    level=level,
+                    source=source
+                ) }}">
+                    Next →
+                </a>
+
+                {% endif %}
+
+            </div>
+
+
+            {% else %}
+
+            <div class="empty-state">
+
+                <h3>
+                    No logs found
+                </h3>
+
+                <p>
+                    Try changing your search or filters.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

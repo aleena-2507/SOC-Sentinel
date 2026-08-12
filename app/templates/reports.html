@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Reports</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/dashboard.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡️
+            <span>SOC Sentinel</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}">
+                Detection Rules
+            </a>
+
+            <a href="{{ url_for('mitre') }}">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}"
+               class="active">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <!-- Main -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Security Reports
+                </h1>
+
+                <p>
+                    Security monitoring and incident reporting
+                </p>
+
+            </div>
+
+            <div class="user-info">
+                👤 {{ current_user.username }}
+            </div>
+
+        </header>
+
+
+        <!-- Report actions -->
+
+        <section class="panel report-action-panel">
+
+            <div>
+
+                <h2>
+                    Security Assessment Report
+                </h2>
+
+                <p>
+                    Generate a report from the current
+                    SOC Sentinel security data.
+                </p>
+
+            </div>
+
+            <a href="{{ url_for('download_report') }}"
+               class="download-report-button">
+
+                Download PDF
+
+            </a>
+
+        </section>
+
+
+        <!-- Alert summary -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <span>Total Alerts</span>
+
+                <strong>
+                    {{ total_alerts }}
+                </strong>
+
+                <small>
+                    Current alerts
+                </small>
+
+            </div>
+
+
+            <div class="stat-card critical">
+
+                <span>Critical</span>
+
+                <strong>
+                    {{ critical_count }}
+                </strong>
+
+                <small>
+                    Requires attention
+                </small>
+
+            </div>
+
+
+            <div class="stat-card high">
+
+                <span>High</span>
+
+                <strong>
+                    {{ high_count }}
+                </strong>
+
+                <small>
+                    Priority alerts
+                </small>
+
+            </div>
+
+
+            <div class="stat-card medium">
+
+                <span>Medium</span>
+
+                <strong>
+                    {{ medium_count }}
+                </strong>
+
+                <small>
+                    Monitoring
+                </small>
+
+            </div>
+
+        </section>
+
+
+        <!-- Incident summary -->
+
+        <section class="panel report-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Incident Summary
+                </h2>
+
+                <span>
+                    {{ total_incidents }} incidents
+                </span>
+
+            </div>
+
+
+            <div class="report-status-grid">
+
+                <div>
+                    <strong>
+                        {{ open_incidents }}
+                    </strong>
+
+                    <span>
+                        Open
+                    </span>
+                </div>
+
+                <div>
+                    <strong>
+                        {{ investigating_incidents }}
+                    </strong>
+
+                    <span>
+                        Investigating
+                    </span>
+                </div>
+
+                <div>
+                    <strong>
+                        {{ resolved_incidents }}
+                    </strong>
+
+                    <span>
+                        Resolved
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- MITRE -->
+
+        <section class="panel report-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    MITRE ATT&CK Summary
+                </h2>
+
+                <a href="{{ url_for('mitre') }}">
+                    View MITRE
+                </a>
+
+            </div>
+
+
+            {% if mitre_summary %}
+
+            <div class="report-table">
+
+                <div class="report-table-row report-table-header">
+
+                    <span>
+                        Technique
+                    </span>
+
+                    <span>
+                        Name
+                    </span>
+
+                    <span>
+                        Tactic
+                    </span>
+
+                    <span>
+                        Alerts
+                    </span>
+
+                </div>
+
+
+                {% for technique in mitre_summary %}
+
+                <div class="report-table-row">
+
+                    <span>
+                        {{ technique.id }}
+                    </span>
+
+                    <span>
+                        {{ technique.name }}
+                    </span>
+
+                    <span>
+                        {{ technique.tactic }}
+                    </span>
+
+                    <span>
+                        {{ technique.count }}
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+                No MITRE techniques detected.
+            </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- Recent alerts -->
+
+        <section class="panel report-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Recent Security Alerts
+                </h2>
+
+                <a href="{{ url_for('alerts') }}">
+                    View all
+                </a>
+
+            </div>
+
+
+            <div class="alerts-list">
+
+                {% for alert in recent_alerts %}
+
+                <div class="alert-row">
+
+                    <div class="alert-main">
+
+                        <h3>
+                            {{ alert.title }}
+                        </h3>
+
+                        <p>
+                            {{ alert.description }}
+                        </p>
+
+                    </div>
+
+
+                    <span class="
+                        alert-severity
+                        {{ alert.severity|lower }}
+                    ">
+
+                        {{ alert.severity }}
+
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

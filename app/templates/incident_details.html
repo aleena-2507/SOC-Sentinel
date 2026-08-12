@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Incident Details</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡️
+            <span>SOC Sentinel</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}"
+               class="active">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}">
+                Detection Rules
+            </a>
+
+            <a href="{{ url_for('mitre') }}">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Incident Details</h1>
+
+                <p>
+                    SOC Sentinel incident investigation
+                </p>
+
+            </div>
+
+            <div class="user-info">
+                👤 {{ current_user.username }}
+            </div>
+
+        </header>
+
+
+        <section class="panel alert-details-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    {{ incident.title }}
+                </h2>
+
+                <span class="alert-severity
+                    {{ incident.severity|lower }}">
+
+                    {{ incident.severity }}
+
+                </span>
+
+            </div>
+
+
+            <div class="alert-information">
+
+                <div class="detail-item">
+
+                    <span>Incident ID</span>
+
+                    <strong>
+                        #{{ incident.id }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>Severity</span>
+
+                    <strong>
+                        {{ incident.severity }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>Status</span>
+
+                    <strong>
+                        {{ incident.status }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>Created</span>
+
+                    <strong>
+                        {{ incident.created_at.strftime(
+                            "%d %b %Y, %H:%M"
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>Linked Alert</span>
+
+                    <strong>
+
+                        {% if incident.alert %}
+
+                        <a href="{{ url_for(
+                            'alert_details',
+                            alert_id=incident.alert.id
+                        ) }}">
+                            Alert #{{ incident.alert.id }}
+                        </a>
+
+                        {% else %}
+
+                        None
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="alert-description">
+
+                <h3>Description</h3>
+
+                <p>
+                    {{ incident.description }}
+                </p>
+
+            </div>
+
+
+            <!-- Incident Status -->
+
+            <div class="status-update-section">
+
+                <h3>Update Incident Status</h3>
+
+                <form method="POST"
+                      action="{{ url_for(
+                          'update_incident_status',
+                          incident_id=incident.id
+                      ) }}">
+
+                    <select name="status">
+
+                        <option value="Open"
+                            {% if incident.status == "Open" %}
+                            selected
+                            {% endif %}>
+                            Open
+                        </option>
+
+                        <option value="Investigating"
+                            {% if incident.status == "Investigating" %}
+                            selected
+                            {% endif %}>
+                            Investigating
+                        </option>
+
+                        <option value="Resolved"
+                            {% if incident.status == "Resolved" %}
+                            selected
+                            {% endif %}>
+                            Resolved
+                        </option>
+
+                    </select>
+
+                    <button type="submit"
+                            class="back-button">
+
+                        Update Status
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="alert-actions">
+
+                <a href="{{ url_for('incidents') }}"
+                   class="back-button">
+
+                    ← Back to Incidents
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

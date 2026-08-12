@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                🛡️
+                <span>SOC Sentinel</span>
+            </div>
+
+            <nav>
+                <a href="{{ url_for('dashboard') }}" class="active">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('alerts') }}">
+                    Alerts
+                </a>
+
+                <a href="{{ url_for('incidents') }}">
+                    Incidents
+                </a>
+
+                <a href="{{ url_for('logs') }}">
+                    Log Explorer
+                </a>
+
+                <a href="{{ url_for('detection_rules') }}">
+                    Detection Rules
+                </a>
+
+                <a href="{{ url_for('mitre') }}">
+                    MITRE ATT&CK
+                </a>
+
+                <a href="{{ url_for('reports') }}">
+                    Reports
+                </a>
+
+                <a href="{{ url_for('settings') }}">
+                    Settings
+                </a>
+                
+            </nav>
+
+            <a href="{{ url_for('auth.logout') }}" class="logout">
+                Logout
+            </a>
+
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Header -->
+            <header class="topbar">
+
+                <div>
+                    <h1>Security Overview</h1>
+                    <p>SOC monitoring dashboard</p>
+                </div>
+
+                <div class="user-info">
+                    👤 {{ current_user.username }}
+                </div>
+
+            </header>
+
+
+            <!-- Statistics -->
+            <section class="stats">
+
+                <div class="stat-card">
+                    <span>Total Events</span>
+                    <strong>
+                        {{ total_events }}
+                    </strong>
+                    <small>Today</small>
+                </div>
+
+                <div class="stat-card critical">
+                    <span>Critical Alerts</span>
+                    <strong>
+                        {{ critical_count }}
+                    </strong>
+                    <small>Requires attention</small>
+                </div>
+
+                <div class="stat-card high">
+                    <span>High Alerts</span>
+                    <strong>
+                        {{ high_count }}
+                    </strong>
+                    <small>Under investigation</small>
+                </div>
+
+                <div class="stat-card medium">
+                    <span>Medium Alerts</span>
+                    <strong>
+                        {{ medium_count }}
+                    </strong>
+                    <small>Monitoring</small>
+                </div>
+
+            </section>
+
+
+            <!-- Dashboard Grid -->
+            <section class="dashboard-grid">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h2>Alert Trend</h2>
+                        <span>Last 24 hours</span>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="alertTrendChart"></canvas>
+                    </div>    
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h2>Alert Severity</h2>
+                        <span>Current</span>
+                    </div>
+
+                    <div class="severity-list">
+
+                        <div>
+                            <span>Critical</span>
+                            <strong>4</strong>
+                        </div>
+
+                        <div>
+                            <span>High</span>
+                            <strong>12</strong>
+                        </div>
+
+                        <div>
+                            <span>Medium</span>
+                            <strong>27</strong>
+                        </div>
+
+                        <div>
+                            <span>Low</span>
+                            <strong>85</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+            <!-- System Status -->
+            <section class="panel system-status-panel">
+
+                <div class="panel-header">
+                    <h2>System Status</h2>
+                    <span>Current</span>
+                </div>
+
+                <div class="system-status-list">
+
+                    <div class="status-item">
+                        <div>
+                            <strong>SOC Application</strong>
+                            <small>Flask application</small>
+                        </div>
+
+                        <span class="status online">
+                            ● Online
+                        </span>
+                    </div>
+
+                    <div class="status-item">
+                        <div>
+                        <strong>Database</strong>
+                        <small>SQLite database</small>
+                    </div>
+
+                    <span class="status online">
+                        ● Online
+                    </span>
+                </div>
+
+                <div class="status-item">
+                    <div>
+                        <strong>Log Collector</strong>
+                        <small>Live log ingestion</small>
+                    </div>
+
+                    <span class="status pending">
+                        ● Not Connected
+                    </span>
+                </div>
+
+                <div class="status-item">
+                    <div>
+                        <strong>Detection Engine</strong>
+                        <small>Security detection rules</small>
+            </div>
+
+                    <span class="status pending">
+                        ● Not Connected
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+           
+            <!-- Recent Alerts -->
+            <section class="panel alerts-panel">
+
+                <div class="panel-header">
+
+                    <h2>Recent Security Alerts</h2>
+
+                    <a href="#">
+                        View all
+                    </a>
+
+                </div>
+                <div class="alerts-list">
+
+                    {% if recent_alerts %}
+
+                        {% for alert in recent_alerts %}
+
+                        <a href="{{ url_for('alert_details', alert_id=alert.id) }}"
+                            class="alert-row alert-link">
+
+                            <div>
+                                <strong>{{ alert.title }}</strong>
+
+                                <small>{{ alert.source }}</small>
+                            </div>
+
+                            <span class="badge
+                            {% if alert.severity == 'Critical' %}
+                                critical-badge
+                            {% elif alert.severity == 'High' %}
+                                high-badge
+                            {% elif alert.severity == 'Medium' %}
+                                medium-badge
+                            {% endif %}">
+
+                            {{ alert.severity }}
+
+                        </span>
+
+                    </a>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+                        No security alerts.
+                    </div>
+
+                {% endif %}
+
+                </div>
+
+                
+            </section>
+
+        </main>
+
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById("alertTrendChart");
+
+    new Chart(ctx, {
+        type: "line",
+
+        data: {
+            labels: [
+                "00:00",
+                "04:00",
+                "08:00",
+                "12:00",
+                "16:00",
+                "20:00"
+            ],
+
+            datasets: [{
+                label: "Security Alerts",
+
+                data: [
+                    2,
+                    4,
+                    3,
+                    8,
+                    6,
+                    10
+                ],
+
+                borderWidth: 2,
+
+                tension: 0.3,
+
+                fill: false
+            }]
+        },
+
+        options: {
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

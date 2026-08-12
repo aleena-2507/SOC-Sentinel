@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Incidents</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡️
+            <span>SOC Sentinel</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}"
+               class="active">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}">
+                Detection Rules
+            </a>
+
+            <a href="{{ url_for('mitre') }}">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Security Incidents</h1>
+
+                <p>
+                    SOC Sentinel incident management
+                </p>
+
+            </div>
+
+            <div class="user-info">
+                👤 {{ current_user.username }}
+            </div>
+
+        </header>
+
+
+        <section class="panel incidents-panel">
+
+            <div class="panel-header">
+
+                <h2>All Incidents</h2>
+
+                <span>
+                    {{ incidents|length }} incidents
+                </span>
+
+            </div>
+
+
+            {% if incidents %}
+
+                <div class="incidents-list">
+
+                    {% for incident in incidents %}
+
+                    <a href="{{ url_for(
+                        'incident_details',
+                        incident_id=incident.id
+                    ) }}"
+                       class="incident-row">
+
+                        <div>
+
+                            <h3>
+                                {{ incident.title }}
+                            </h3>
+
+                            <p>
+                                {{ incident.description }}
+                            </p>
+
+                            <div class="incident-meta">
+
+                                <span>
+                                    Incident #{{ incident.id }}
+                                </span>
+
+                                <span>
+                                    Status: {{ incident.status }}
+                                </span>
+
+                                {% if incident.alert %}
+                                <span>
+                                    Alert #{{ incident.alert.id }}
+                                </span>
+                                {% endif %}
+
+                                <span>
+                                    {{ incident.created_at.strftime(
+                                        "%d %b %Y, %H:%M"
+                                    ) }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <span class="alert-severity
+                            {{ incident.severity|lower }}">
+
+                            {{ incident.severity }}
+
+                        </span>
+
+                    </a>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>No incidents</h3>
+
+                    <p>
+                        No security incidents have been created yet.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

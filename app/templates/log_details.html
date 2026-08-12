@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Log Details</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="layout">
+
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡️
+            <span>SOC Sentinel</span>
+        </div>
+
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}"
+               class="active">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}">
+                Detection Rules
+            </a>
+
+            <a href="{{ url_for('mitre') }}">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+
+            Logout
+
+        </a>
+
+    </aside>
+
+
+    <main class="main-content">
+
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Log Details</h1>
+
+                <p>
+                    Security log investigation
+                </p>
+
+            </div>
+
+
+            <div class="user-info">
+
+                👤 {{ current_user.username }}
+
+            </div>
+
+        </header>
+
+
+        <section class="panel log-details-panel">
+
+
+            <div class="panel-header">
+
+                <h2>
+                    Log #{{ log.id }}
+                </h2>
+
+                <span class="log-level
+                    {{ log.level|lower }}">
+
+                    {{ log.level }}
+
+                </span>
+
+            </div>
+
+
+            <div class="log-detail-grid">
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Timestamp
+                    </span>
+
+                    <strong>
+
+                        {{ log.timestamp.strftime(
+                            "%d %b %Y, %H:%M:%S"
+                        ) }}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Source
+                    </span>
+
+                    <strong>
+                        {{ log.source }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Level
+                    </span>
+
+                    <strong>
+                        {{ log.level }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        IP Address
+                    </span>
+
+                    <strong>
+                        {{ log.ip_address or "-" }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Username
+                    </span>
+
+                    <strong>
+                        {{ log.username or "-" }}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="log-full-message">
+
+                <h3>
+                    Log Message
+                </h3>
+
+                <p>
+                    {{ log.message }}
+                </p>
+
+            </div>
+
+
+            <div class="alert-actions">
+
+                <a
+                    href="{{ url_for('logs') }}"
+                    class="back-button">
+
+                    ← Back to Logs
+
+                </a>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

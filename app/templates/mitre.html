@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | MITRE ATT&CK</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/dashboard.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡️
+            <span>SOC Sentinel</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}">
+                Detection Rules
+            </a>
+
+            <a href="{{ url_for('mitre') }}"
+               class="active">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <!-- Main -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    MITRE ATT&CK
+                </h1>
+
+                <p>
+                    Threat technique mapping
+                </p>
+
+            </div>
+
+            <div class="user-info">
+                👤 {{ current_user.username }}
+            </div>
+
+        </header>
+
+
+        <!-- Overview -->
+
+        <section class="panel mitre-overview">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        MITRE ATT&CK Coverage
+                    </h2>
+
+                    <span>
+                        Techniques identified by SOC Sentinel
+                    </span>
+
+                </div>
+
+                <span>
+                    {{ techniques|length }} techniques
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- Techniques -->
+
+        <section class="mitre-grid">
+
+            {% for technique in techniques %}
+
+            <article class="panel mitre-card">
+
+                <div class="mitre-card-header">
+
+                    <div>
+
+                        <span class="technique-id">
+                            {{ technique.id }}
+                        </span>
+
+                        <h2>
+                            {{ technique.name }}
+                        </h2>
+
+                    </div>
+
+                    <span class="alert-count">
+                        {{ technique.alert_count }}
+                        alerts
+                    </span>
+
+                </div>
+
+
+                <div class="mitre-tactic">
+
+                    Tactic:
+                    <strong>
+                        {{ technique.tactic }}
+                    </strong>
+
+                </div>
+
+
+                <p class="mitre-description">
+                    {{ technique.description }}
+                </p>
+
+
+                <div class="mitre-card-footer">
+
+                    <span>
+                        Detection coverage
+                    </span>
+
+                    <a href="{{ technique.url }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+
+                        View MITRE ↗
+
+                    </a>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

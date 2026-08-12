@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Alerts</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡️
+            <span>SOC Sentinel</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}" class="active">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}">
+                Detection Rules
+            </a>
+
+            <a href="{{ url_for('mitre') }}">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Security Alerts</h1>
+                <p>SOC Sentinel alert monitoring</p>
+            </div>
+
+            <div class="user-info">
+                👤 {{ current_user.username }}
+            </div>
+
+        </header>
+
+
+        <!-- Alert Summary -->
+        <section class="stats">
+
+            <div class="stat-card">
+                <span>Total Alerts</span>
+                <strong>{{ alerts|length }}</strong>
+                <small>Current alerts</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Critical</span>
+                <strong class="critical-text">
+                    {{ critical_count }}
+                </strong>
+                <small>Requires attention</small>
+            </div>
+
+            <div class="stat-card">
+                <span>High</span>
+                <strong class="high-text">
+                    {{ high_count }}
+                </strong>
+                <small>Priority alerts</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Medium</span>
+                <strong class="medium-text">
+                    {{ medium_count }}
+                </strong>
+                <small>Monitoring</small>
+            </div>
+
+        </section>
+
+
+        <!-- Alerts Table -->
+        <section class="panel alerts-page-panel">
+
+            <div class="panel-header">
+
+                <h2>All Security Alerts</h2>
+
+                <span>
+                    {{ alerts|length }} alerts
+                </span>
+
+            </div>
+
+
+            <div class="alerts-list">
+
+                {% if alerts %}
+
+                    {% for alert in alerts %}
+
+                    <a href="{{ url_for('alert_details', alert_id=alert.id) }}"
+                        class="alert-row alert-link">
+
+                        <div class="alert-main">
+
+                            <h3>
+                                {{ alert.title }}
+                            </h3>
+
+                            <p>
+                                {{ alert.description }}
+                            </p>
+
+                            <div class="alert-meta">
+
+                                <span>
+                                    Source: {{ alert.source }}
+                                </span>
+
+                                <span>
+                                    Status: {{ alert.status }}
+                                </span>
+
+                                <span>
+                                    MITRE: {{ alert.mitre_technique or "N/A" }}
+                                </span>
+
+                                <span>
+                                    {{ alert.timestamp.strftime("%d %b %Y, %H:%M") }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="alert-severity
+                            {{ alert.severity|lower }}">
+
+                            {{ alert.severity }}
+
+                        </div>
+
+                    </a>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+                        <h3>No security alerts</h3>
+                        <p>
+                            No alerts have been detected yet.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

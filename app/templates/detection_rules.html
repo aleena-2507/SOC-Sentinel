@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Sentinel | Detection Rules</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/dashboard.css'
+          ) }}">
+
+</head>
+
+
+<body>
+
+<div class="layout">
+
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            🛡️
+
+            <span>
+                SOC Sentinel
+            </span>
+
+        </div>
+
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('alerts') }}">
+                Alerts
+            </a>
+
+            <a href="{{ url_for('incidents') }}">
+                Incidents
+            </a>
+
+            <a href="{{ url_for('logs') }}">
+                Log Explorer
+            </a>
+
+            <a href="{{ url_for('detection_rules') }}"
+               class="active">
+
+                Detection Rules
+
+            </a>
+
+            <a href="{{ url_for('mitre') }}">
+                MITRE ATT&CK
+            </a>
+
+            <a href="{{ url_for('reports') }}">
+                Reports
+            </a>
+
+            <a href="{{ url_for('settings') }}">
+                Settings
+            </a>
+
+        </nav>
+
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="logout">
+
+            Logout
+
+        </a>
+
+    </aside>
+
+
+    <!-- Main -->
+
+    <main class="main-content">
+
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Detection Rules
+                </h1>
+
+                <p>
+                    Security detection and rule management
+                </p>
+
+            </div>
+
+
+            <div class="user-info">
+
+                👤 {{ current_user.username }}
+
+            </div>
+
+        </header>
+
+
+        <!-- Detection Engine -->
+
+        <section class="panel detection-engine-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Detection Engine
+                    </h2>
+
+                    <span>
+                        Scan stored logs against active rules
+                    </span>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'run_detection_rules'
+                    ) }}">
+
+                    <button
+                        type="submit"
+                        class="run-detection-button">
+
+                        ▶ Run Detection
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- Rules -->
+
+        <section class="panel rules-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Security Detection Rules
+                </h2>
+
+                <span>
+                    {{ rules|length }} rules
+                </span>
+
+            </div>
+
+
+            {% if rules %}
+
+            <div class="rules-list">
+
+                {% for rule in rules %}
+
+                <div class="rule-row">
+
+
+                    <div class="rule-main">
+
+                        <h3>
+                            {{ rule.name }}
+                        </h3>
+
+                        <p>
+                            {{ rule.description }}
+                        </p>
+
+
+                        <div class="rule-meta">
+
+                            <span>
+                                Keyword:
+                                <strong>
+                                    {{ rule.keyword }}
+                                </strong>
+                            </span>
+
+                            <span>
+                                Source:
+                                {{ rule.source or "Any" }}
+                            </span>
+
+                            <span>
+                                MITRE:
+                                {{ rule.mitre_technique or "-" }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="rule-side">
+
+                        <span class="
+                            rule-severity
+                            {{ rule.severity|lower }}
+                        ">
+
+                            {{ rule.severity }}
+
+                        </span>
+
+
+                        {% if rule.enabled %}
+
+                        <span class="rule-status enabled">
+                            ● Enabled
+                        </span>
+
+                        {% else %}
+
+                        <span class="rule-status disabled">
+                            ● Disabled
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            {% else %}
+
+            <div class="empty-state">
+
+                <h3>
+                    No detection rules found
+                </h3>
+
+                <p>
+                    Add detection rules to begin
+                    monitoring security events.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
