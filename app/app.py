@@ -54,7 +54,9 @@ def create_app():
     # Register authentication routes
     from app.routes.auth import auth
     app.register_blueprint(auth)
-
+    @app.route("/")
+    def home():
+        return redirect(url_for("auth.login"))
     # Dashboard
     @app.route("/dashboard")
     def dashboard():
@@ -871,14 +873,6 @@ def create_app():
             }
         )
 
-    # Settings
-    @app.route("/settings")
-    def settings():
-        return render_template(
-            "coming_soon.html",
-            title="Settings",
-            description="Application settings will be implemented later."
-        )
 
     # Create database tables
     with app.app_context():
